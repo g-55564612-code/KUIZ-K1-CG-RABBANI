@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuiz Sejarah Kertas 1 &mdash; SMK Dato' Undang Musa Al-Haj</title>
+<style>
+:root{
+  --nila:#10243F;--nila-2:#1B3A5F;--emas:#C79A3C;--emas-lembut:#E8CF95;
+  --krim:#F7F2E4;--kertas:#FFFDF7;--jade:#1E7A5A;--jade-lembut:#DDF0E7;
+  --bata:#B3392F;--bata-lembut:#FBE3E0;--kelabu:#6C7A89;--garis:rgba(16,36,63,.14);
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);background:var(--krim);color:var(--nila);line-height:1.55;-webkit-text-size-adjust:100%}
+.songket{height:10px;background:repeating-linear-gradient(135deg,var(--emas) 0 8px,transparent 8px 16px),linear-gradient(var(--nila),var(--nila))}
+header.utama{background:var(--nila);color:var(--krim);padding:26px 20px 22px;text-align:center}
+header.utama .eyebrow{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--emas-lembut);margin:0 0 10px}
+header.utama h1{font-family:var(--serif);font-weight:normal;font-size:clamp(1.6rem,5vw,2.6rem);margin:0;line-height:1.2}
+header.utama h1 em{color:var(--emas);font-style:normal}
+header.utama .kredit{margin:14px auto 0;max-width:640px;font-size:.86rem;color:#CBD8E6}
+header.utama .kredit strong{color:var(--krim)}
+.bekas{max-width:900px;margin:0 auto;padding:26px 18px 70px}
+.intro{background:var(--kertas);border:1px solid var(--garis);border-left:5px solid var(--emas);padding:16px 18px;margin-bottom:26px;font-size:.94rem}
+.intro p{margin:0 0 8px}.intro p:last-child{margin:0}
+.tajuk-seksyen{font-family:var(--serif);font-size:1.15rem;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--emas)}
+.grid-set{display:grid;gap:18px}
+@media(min-width:720px){.grid-set{grid-template-columns:1fr 1fr}}
+.kad-set{background:var(--kertas);border:1px solid var(--garis);box-shadow:0 2px 0 rgba(16,36,63,.06);padding:20px;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease}
+.kad-set:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(16,36,63,.12)}
+.kad-set .kod{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--emas);font-weight:700;margin-bottom:8px}
+.kad-set h3{font-family:var(--serif);font-weight:normal;font-size:1.3rem;margin:0 0 6px}
+.kad-set .perincian{font-size:.86rem;color:var(--kelabu);margin:0 0 16px}
+.kad-set .butang-set{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+button{font-family:inherit;font-size:1rem;cursor:pointer}
+.btn{border:none;padding:11px 18px;border-radius:2px;font-weight:600;font-size:.9rem;letter-spacing:.02em;transition:background .15s ease,color .15s ease}
+.btn-utama{background:var(--nila);color:var(--krim)}.btn-utama:hover{background:var(--nila-2)}
+.btn-emas{background:var(--emas);color:var(--nila)}.btn-emas:hover{background:#B0862B}
+.btn-garis{background:transparent;color:var(--nila);border:1.5px solid var(--nila)}
+.btn-garis:hover{background:var(--nila);color:var(--krim)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn:focus-visible,.pilihan:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--emas);outline-offset:2px}
+/* ---- daftar ---- */
+.borang{background:var(--kertas);border:1px solid var(--garis);padding:22px 20px;max-width:520px;margin:0 auto}
+.medan{margin-bottom:16px}
+.medan label{display:block;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--kelabu);margin-bottom:6px;font-weight:700}
+.medan select,.medan input{width:100%;padding:12px;font-size:1rem;font-family:inherit;border:1.5px solid var(--garis);background:#fff;color:var(--nila);border-radius:2px}
+.amaran{background:var(--bata-lembut);border-left:4px solid var(--bata);padding:10px 12px;font-size:.86rem;margin-bottom:14px}
+.jaya{background:var(--jade-lembut);border-left:4px solid var(--jade);padding:10px 12px;font-size:.86rem;margin-bottom:14px}
+/* ---- bar ---- */
+.bar-atas{position:sticky;top:0;z-index:20;background:var(--nila);color:var(--krim);display:flex;align-items:center;gap:10px;padding:10px 14px;flex-wrap:wrap}
+.bar-atas .nav-btn{background:transparent;border:1px solid rgba(247,242,228,.45);color:var(--krim);padding:7px 13px;border-radius:2px;font-size:.82rem;font-weight:600}
+.bar-atas .nav-btn:hover{background:rgba(247,242,228,.14)}
+.bar-atas .label-set{flex:1;min-width:110px;font-size:.8rem;color:var(--emas-lembut);text-align:center;letter-spacing:.05em}
+.bar-atas .skor,.bar-atas .jam{font-size:.82rem;font-weight:700}
+.bar-atas .jam{color:var(--emas-lembut);font-variant-numeric:tabular-nums}
+.progres{height:5px;background:rgba(16,36,63,.15)}
+.progres i{display:block;height:100%;background:var(--emas);width:0;transition:width .3s ease}
+.meta-soalan{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.no-soalan{font-family:var(--serif);font-size:2.1rem;color:var(--emas);line-height:1}
+.lencana{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:4px 9px;border:1px solid var(--garis);background:var(--kertas);color:var(--kelabu)}
+.lencana.aras-T{border-color:var(--bata);color:var(--bata)}
+.lencana.aras-S{border-color:var(--emas);color:#8F6B1C}
+.lencana.aras-R{border-color:var(--jade);color:var(--jade)}
+.kad-soalan{background:var(--kertas);border:1px solid var(--garis);padding:22px 20px;animation:masuk .35s ease}
+@keyframes masuk{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.teks-soalan{font-size:1.06rem;margin:0 0 14px}
+.stim{border:1.5px solid var(--nila);background:#fff;padding:12px 14px;margin:0 0 16px;font-size:.95rem;white-space:pre-line}
+.stim.gambar{border-style:dashed;color:var(--kelabu);font-style:italic}
+.senarai-pilihan{display:grid;gap:9px;margin:0 0 6px}
+.pilihan{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;background:#fff;border:1.5px solid var(--garis);padding:12px 14px;font-size:.96rem;color:var(--nila);border-radius:2px;transition:border-color .15s ease,background .15s ease,transform .12s ease}
+.pilihan:hover:not(:disabled){border-color:var(--nila)}
+.pilihan .huruf{font-family:var(--serif);font-weight:bold;color:var(--nila);width:26px;height:26px;flex:none;display:grid;place-items:center;border:1.5px solid var(--nila);border-radius:50%;font-size:.85rem;line-height:1}
+.pilihan.betul{border-color:var(--jade);background:var(--jade-lembut);animation:denyut .5s ease}
+.pilihan.betul .huruf{background:var(--jade);border-color:var(--jade);color:#fff}
+.pilihan.salah{border-color:var(--bata);background:var(--bata-lembut);animation:goyang .4s ease}
+.pilihan.salah .huruf{background:var(--bata);border-color:var(--bata);color:#fff}
+.pilihan:disabled{cursor:default;opacity:1}
+.pilihan.pudar{opacity:.5}
+@keyframes denyut{0%{transform:scale(1)}35%{transform:scale(1.035)}70%{transform:scale(.995)}100%{transform:scale(1)}}
+@keyframes goyang{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.kotak-klu{margin:16px 0 0}
+.kotak-klu .isi{border:1px dashed var(--emas);background:#FFFBF0;padding:12px 14px;margin-top:9px;font-size:.9rem;animation:masuk .3s ease}
+.kotak-klu .isi b{color:#8F6B1C}
+.maklumbalas{margin-top:18px;animation:masuk .35s ease}
+.cop{display:inline-block;font-family:var(--serif);font-size:1.15rem;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;padding:6px 16px;border:3px double currentColor;transform:rotate(-3deg);animation:cop-turun .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes cop-turun{0%{opacity:0;transform:rotate(-16deg) scale(2.2)}60%{opacity:1;transform:rotate(-3deg) scale(.94)}100%{transform:rotate(-3deg) scale(1)}}
+.cop.ya{color:var(--jade)}.cop.tak{color:var(--bata)}
+.panel{border:1px solid var(--garis);background:var(--kertas);padding:14px 16px;margin-top:12px}
+.panel h4{margin:0 0 8px;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--kelabu)}
+.panel p{margin:0;font-size:.94rem}
+.panel.jawapan{border-left:5px solid var(--jade)}
+.panel.jawapan .kunci{font-family:var(--serif);font-size:1.05rem;color:var(--jade);font-weight:bold}
+.senarai-salah{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.senarai-salah li{display:flex;gap:10px;font-size:.9rem;align-items:flex-start}
+.senarai-salah .h{font-family:var(--serif);font-weight:bold;color:var(--bata);flex:none;border:1.5px solid var(--bata);width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font-size:.78rem;line-height:1}
+.rujukan{margin-top:12px;font-size:.82rem;color:var(--kelabu);border-top:1px dotted var(--garis);padding-top:10px}
+.rujukan b{color:var(--nila)}
+.nav-bawah{display:flex;gap:10px;justify-content:space-between;margin-top:20px;flex-wrap:wrap}
+.nav-bawah .kanan{display:flex;gap:10px;flex-wrap:wrap}
+.keputusan{background:var(--kertas);border:1px solid var(--garis);padding:26px 20px;text-align:center}
+.markah{font-family:var(--serif);font-size:3.4rem;line-height:1;color:var(--nila);margin:6px 0}
+.markah span{font-size:1.4rem;color:var(--kelabu)}
+.gred{display:inline-block;font-weight:700;letter-spacing:.1em;padding:6px 18px;background:var(--nila);color:var(--krim);margin-bottom:10px}
+.ringkas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px;margin:22px 0 0}
+.sel{padding:7px 0;text-align:center;font-size:.78rem;font-weight:700;border:1px solid var(--garis);background:#fff}
+.sel.b{background:var(--jade-lembut);border-color:var(--jade);color:var(--jade)}
+.sel.s{background:var(--bata-lembut);border-color:var(--bata);color:var(--bata)}
+.sel.k{color:var(--kelabu)}
+#cetak{display:none}
+.cetak-tajuk{text-align:center;margin-bottom:18px}
+.cetak-soalan{margin-bottom:16px;page-break-inside:avoid;border-bottom:1px solid #ccc;padding-bottom:12px}
+.cetak-soalan .cs-tajuk{font-weight:bold}
+.cetak-soalan .cs-pil{margin:4px 0 6px;padding-left:16px;font-size:.92rem}
+.cetak-soalan .cs-jwp{font-size:.9rem}
+footer.kaki{background:var(--nila);color:#BFCDDD;text-align:center;padding:22px 18px;font-size:.82rem}
+footer.kaki strong{color:var(--emas-lembut)}
+footer.kaki a{color:var(--emas-lembut)}
+.status-hantar{margin-top:14px;font-size:.88rem}
+@media print{
+  body{background:#fff;color:#000}
+  header.utama,footer.kaki,.songket,#daftar,#menu,#kuiz,#keputusan,.tiada-cetak{display:none !important}
+  #cetak{display:block !important}
+  .bekas{max-width:100%;padding:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="songket"></div>
+<header class="utama">
+  <p class="eyebrow">Sejarah 1249/1 &middot; Kertas Objektif</p>
+  <h1>Kuiz Latih Tubi <em>Kertas 1</em></h1>
+  <p class="kredit">Disediakan oleh <strong>Cikgu Muhammad Rabbani</strong> &middot; SMK Dato' Undang Musa Al-Haj, Jelebu</p>
+</header>
+<div class="songket"></div>
+
+<main class="bekas">
+
+  <!-- ============ DAFTAR NAMA ============ -->
+  <section id="daftar">
+    <div class="intro">
+      <p><b>Sebelum mula:</b> pilih kelas dan nama anda. Markah, jawapan setiap soalan dan masa menjawab akan dihantar kepada cikgu secara automatik selepas kuiz tamat.</p>
+    </div>
+    <div class="borang">
+      <h2 class="tajuk-seksyen">Pengenalan diri</h2>
+      <div class="medan">
+        <label for="pilih-kelas">Kelas</label>
+        <select id="pilih-kelas"></select>
+      </div>
+      <div class="medan">
+        <label for="pilih-nama">Nama penuh</label>
+        <select id="pilih-nama"></select>
+      </div>
+      <div class="medan" id="medan-lain" hidden>
+        <label for="nama-lain">Taip nama penuh anda</label>
+        <input id="nama-lain" type="text" placeholder="Contoh: AHMAD BIN ALI" autocomplete="off">
+      </div>
+      <p id="ralat-daftar" class="amaran" hidden></p>
+      <button class="btn btn-utama" id="btn-daftar" style="width:100%">Teruskan</button>
+    </div>
+  </section>
+
+  <!-- ============ MENU SET ============ -->
+  <section id="menu" hidden>
+    <div class="intro">
+      <p><b id="salam-nama"></b></p>
+      <p>Pilih satu set. Jawapan sebenar dan huraian hanya keluar <b>selepas</b> anda membuat pilihan, dan pilihan tidak boleh ditukar &mdash; jawab dengan teliti.</p>
+    </div>
+    <h2 class="tajuk-seksyen">Pilih set soalan</h2>
+    <div class="grid-set" id="senarai-set"></div>
+    <p style="margin-top:22px"><button class="btn btn-garis" id="btn-tukar-nama">Tukar nama</button></p>
+  </section>
+
+  <!-- ============ KUIZ ============ -->
+  <section id="kuiz" hidden>
+    <div class="bar-atas">
+      <button class="nav-btn" id="btn-menu">&#9776; Menu</button>
+      <button class="nav-btn" id="btn-balik">&larr; Kembali</button>
+      <span class="label-set" id="label-set"></span>
+      <span class="jam" id="jam">00:00</span>
+      <span class="skor" id="papar-skor">0 / 0</span>
+    </div>
+    <div class="progres"><i id="bar-progres"></i></div>
+    <div style="padding-top:20px">
+      <div class="meta-soalan">
+        <span class="no-soalan" id="no-soalan">1</span>
+        <span class="lencana" id="lencana-bab"></span>
+        <span class="lencana" id="lencana-aras" hidden></span>
+      </div>
+      <div class="kad-soalan" id="kad-soalan"></div>
+      <div class="nav-bawah">
+        <button class="btn btn-garis" id="btn-sebelum">&larr; Soalan sebelum</button>
+        <div class="kanan">
+          <button class="btn btn-utama" id="btn-seterus">Soalan seterusnya &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ KEPUTUSAN ============ -->
+  <section id="keputusan" hidden>
+    <div class="keputusan">
+      <div class="gred" id="gred-teks">GRED</div>
+      <div class="markah" id="markah-teks">0 <span>/ 40</span></div>
+      <p id="komen-teks" style="margin:0 0 6px;color:var(--kelabu)"></p>
+      <p style="margin:0;font-size:.9rem;color:var(--kelabu)" id="masa-teks"></p>
+      <div class="ringkas-grid" id="ringkas-grid"></div>
+      <div class="status-hantar" id="status-hantar"></div>
+    </div>
+    <div class="nav-bawah">
+      <button class="btn btn-garis" id="btn-menu2">&#9776; Kembali ke menu</button>
+      <div class="kanan">
+        <button class="btn btn-garis" id="btn-hantar-semula" hidden>Hantar semula</button>
+        <button class="btn btn-emas" id="btn-ulang">Cuba semula set ini</button>
+        <button class="btn btn-utama" id="btn-cetak-keputusan">Cetak semakan</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="cetak"></div>
+</main>
+
+<footer class="kaki">
+  <p style="margin:0 0 4px"><strong>Cikgu Muhammad Rabbani</strong> &middot; Panitia Sejarah, SMK Dato' Undang Musa Al-Haj, Jelebu</p>
+  <p style="margin:0"><a href="analisis.html">Papan analisis guru</a></p>
+</footer>
+
+<script src="soalan.js"></script>
+<script src="tetapan.js"></script>
+<script>
+/* =========================================================
+   ENJIN KUIZ
+   ========================================================= */
+const el = id => document.getElementById(id);
+const HURUF = ["A","B","C","D"];
+let setSemasa=null, idx=0, jawapanSaya=[], masaItem=[], mulaItem=0, mulaKuizPada=null, jamTimer=null;
+let murid = {nama:"", kelas:""};
+
+/* ---------- DAFTAR ---------- */
+function binaDaftar(){
+  const sk = el("pilih-kelas"), sn = el("pilih-nama");
+  sk.innerHTML = '<option value="">-- Pilih kelas --</option>' +
+    Object.keys(KELAS).map(k=>`<option>${k}</option>`).join("") +
+    '<option value="LAIN">Kelas lain</option>';
+  sk.onchange = ()=>{
+    const k = sk.value;
+    if(k==="LAIN" || !k){
+      sn.innerHTML = '<option value="">-- Tiada senarai --</option>';
+      el("medan-lain").hidden = (k!=="LAIN");
+      return;
+    }
+    sn.innerHTML = '<option value="">-- Pilih nama --</option>' +
+      KELAS[k].map(n=>`<option>${n}</option>`).join("") +
+      '<option value="LAIN">Nama saya tiada dalam senarai</option>';
+    el("medan-lain").hidden = true;
+  };
+  sn.onchange = ()=>{ el("medan-lain").hidden = (sn.value!=="LAIN"); };
+  sk.onchange();
+}
+el("btn-daftar").onclick = ()=>{
+  const kelas = el("pilih-kelas").value;
+  let nama = el("pilih-nama").value;
+  if(nama==="LAIN" || kelas==="LAIN") nama = el("nama-lain").value.trim().toUpperCase();
+  const ralat = el("ralat-daftar");
+  if(!kelas || !nama){
+    ralat.hidden = false;
+    ralat.textContent = "Sila pilih kelas dan nama anda dahulu.";
+    return;
+  }
+  ralat.hidden = true;
+  murid = {nama:nama, kelas:(kelas==="LAIN"? el("nama-lain").dataset.kelas || "LAIN" : kelas)};
+  if(kelas==="LAIN") murid.kelas = prompt("Taip nama kelas anda:","") || "LAIN";
+  el("salam-nama").textContent = murid.nama + "  \u00b7  " + murid.kelas;
+  tunjuk("menu");
+};
+el("btn-tukar-nama").onclick = ()=>tunjuk("daftar");
+
+/* ---------- MENU ---------- */
+function binaMenu(){
+  const wadah = el("senarai-set");
+  wadah.innerHTML = "";
+  Object.keys(BANK).forEach(kunci=>{
+    const set = BANK[kunci];
+    const kad = document.createElement("div");
+    kad.className = "kad-set";
+    kad.innerHTML = `
+      <div class="kod">${set.kod}</div>
+      <h3>${set.nama}</h3>
+      <p class="perincian">${set.perincian}</p>
+      <div class="butang-set">
+        <button class="btn btn-utama" data-mula="${kunci}">Mula kuiz</button>
+        <button class="btn btn-garis" data-cetak="${kunci}">Cetak set ini</button>
+      </div>`;
+    wadah.appendChild(kad);
+  });
+  wadah.querySelectorAll("[data-mula]").forEach(b=>b.onclick=()=>mulaKuiz(b.dataset.mula));
+  wadah.querySelectorAll("[data-cetak]").forEach(b=>b.onclick=()=>cetakSet(b.dataset.cetak));
+}
+
+function tunjuk(bahagian){
+  ["daftar","menu","kuiz","keputusan"].forEach(id=>el(id).hidden = (id!==bahagian));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---------- KUIZ ---------- */
+function mulaKuiz(kunci){
+  setSemasa = kunci; idx = 0;
+  const jum = BANK[kunci].soalan.length;
+  jawapanSaya = new Array(jum).fill(null);
+  masaItem = new Array(jum).fill(0);
+  mulaKuizPada = new Date();
+  el("label-set").textContent = BANK[kunci].nama;
+  el("btn-hantar-semula").hidden = true;
+  jalankanJam();
+  tunjuk("kuiz");
+  lukisSoalan();
+}
+function jalankanJam(){
+  clearInterval(jamTimer);
+  jamTimer = setInterval(()=>{
+    const s = Math.floor((Date.now()-mulaKuizPada.getTime())/1000);
+    el("jam").textContent = String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  },1000);
+}
+function lukisSoalan(){
+  const set = BANK[setSemasa], sl = set.soalan[idx];
+  mulaItem = Date.now();
+  el("no-soalan").textContent = String(sl.n).padStart(2,"0");
+  el("lencana-bab").textContent = (sl.tk==="T4"?"Tingkatan 4":"Tingkatan 5") + " \u00b7 " + sl.bab;
+  const la = el("lencana-aras");
+  if(sl.aras){ la.hidden=false; la.className="lencana aras-"+sl.aras;
+    la.textContent = "Aras " + ({R:"Rendah",S:"Sederhana",T:"Tinggi"}[sl.aras]); }
+  else la.hidden = true;
+  el("bar-progres").style.width = ((idx+1)/set.soalan.length*100)+"%";
+  kemasSkor();
+
+  const dipilih = jawapanSaya[idx];
+  let html = "";
+  if(sl.stim){
+    const gambar = sl.stim.trim().startsWith("[Gambar") || sl.stim.trim().startsWith("[Peta");
+    html += `<div class="stim${gambar?" gambar":""}">${sl.stim}</div>`;
+  }
+  html += `<p class="teks-soalan">${sl.s}</p>`;
+  if(sl.pilihanTambahan) html += `<div class="stim">${sl.pilihanTambahan}</div>`;
+  html += `<div class="senarai-pilihan">`;
+  HURUF.forEach(h=>{ html += `<button class="pilihan" data-h="${h}"><span class="huruf">${h}</span><span>${sl.p[h]}</span></button>`; });
+  html += `</div>
+    <div class="kotak-klu">
+      <button class="btn btn-garis" id="btn-klu">&#128161; Tunjuk klu</button>
+      <div class="isi" id="isi-klu" hidden><b>Klu:</b> ${sl.klu}</div>
+    </div>
+    <div id="maklumbalas"></div>`;
+  el("kad-soalan").innerHTML = html;
+
+  el("btn-klu").onclick = ()=>{
+    const k = el("isi-klu"); k.hidden = !k.hidden;
+    el("btn-klu").innerHTML = k.hidden ? "&#128161; Tunjuk klu" : "&#128161; Sembunyi klu";
+  };
+  el("kad-soalan").querySelectorAll(".pilihan").forEach(b=>b.onclick=()=>pilih(b.dataset.h));
+  if(dipilih) dedah(dipilih,false);
+
+  el("btn-sebelum").disabled = (idx===0);
+  el("btn-seterus").textContent = (idx===set.soalan.length-1) ? "Tamat & hantar jawapan" : "Soalan seterusnya \u2192";
+}
+function pilih(h){
+  if(jawapanSaya[idx]) return;
+  jawapanSaya[idx] = h;
+  masaItem[idx] = Math.max(1, Math.round((Date.now()-mulaItem)/1000));
+  dedah(h,true);
+  kemasSkor();
+}
+function dedah(dipilih,animasi){
+  const sl = BANK[setSemasa].soalan[idx];
+  const betul = (dipilih===sl.j);
+  el("kad-soalan").querySelectorAll(".pilihan").forEach(b=>{
+    const h = b.dataset.h; b.disabled = true;
+    if(h===sl.j) b.classList.add("betul");
+    else if(h===dipilih) b.classList.add("salah");
+    else b.classList.add("pudar");
+    if(!animasi) b.style.animation = "none";
+  });
+  const senarai = HURUF.filter(h=>h!==sl.j).map(h=>{
+    const sebab = (sl.salah && sl.salah[h]) || "Tidak menepati kehendak soalan.";
+    return `<li><span class="h">${h}</span><span>${sebab}</span></li>`;
+  }).join("");
+  el("maklumbalas").innerHTML = `
+    <div class="maklumbalas">
+      <span class="cop ${betul?"ya":"tak"}" ${animasi?"":'style="animation:none"'}>${betul?"Betul":"Belum tepat"}</span>
+      <div class="panel jawapan">
+        <h4>Jawapan sebenar</h4>
+        <p><span class="kunci">${sl.j}</span> &nbsp; ${sl.p[sl.j]}</p>
+        <p style="margin-top:8px">${sl.betul}</p>
+      </div>
+      <div class="panel">
+        <h4>Mengapa pilihan lain salah</h4>
+        <ul class="senarai-salah">${senarai}</ul>
+      </div>
+      <div class="rujukan">Rujukan: <b>Buku Teks Sejarah ${sl.tk==="T4"?"Tingkatan 4":"Tingkatan 5"}, muka surat ${sl.ms}</b> &nbsp;&middot;&nbsp; Tema: ${sl.bab}</div>
+    </div>`;
+}
+function kemasSkor(){
+  const set = BANK[setSemasa]; let betul=0, dijawab=0;
+  set.soalan.forEach((s,i)=>{ if(jawapanSaya[i]){ dijawab++; if(jawapanSaya[i]===s.j) betul++; } });
+  el("papar-skor").textContent = betul + " / " + dijawab;
+}
+
+el("btn-seterus").onclick = ()=>{
+  const set = BANK[setSemasa];
+  if(idx===set.soalan.length-1) paparKeputusan(); else { idx++; lukisSoalan(); }
+};
+el("btn-sebelum").onclick = ()=>{ if(idx>0){ idx--; lukisSoalan(); } };
+el("btn-balik").onclick = ()=>{ if(idx>0){ idx--; lukisSoalan(); } else tunjuk("menu"); };
+el("btn-menu").onclick = ()=>{ clearInterval(jamTimer); tunjuk("menu"); };
+el("btn-menu2").onclick = ()=>tunjuk("menu");
+el("btn-ulang").onclick = ()=>mulaKuiz(setSemasa);
+
+/* ---------- KEPUTUSAN + HANTAR ---------- */
+function paparKeputusan(){
+  clearInterval(jamTimer);
+  const set = BANK[setSemasa];
+  let betul = 0;
+  set.soalan.forEach((s,i)=>{ if(jawapanSaya[i]===s.j) betul++; });
+  const jum = set.soalan.length, peratus = betul/jum*100;
+  let gred="G", komen="";
+  if(peratus>=90){gred="A+";komen="Cemerlang. Teruskan latih tubi set seterusnya.";}
+  else if(peratus>=80){gred="A";komen="Sangat baik. Semak semula soalan aras tinggi.";}
+  else if(peratus>=70){gred="B";komen="Baik. Ulang kaji tema yang tersilap di bawah.";}
+  else if(peratus>=60){gred="C";komen="Memuaskan. Rujuk semula muka surat buku teks yang dicadangkan.";}
+  else if(peratus>=50){gred="D";komen="Perlu usaha lagi. Baca semula huraian setiap soalan.";}
+  else if(peratus>=40){gred="E";komen="Perlu ulang kaji menyeluruh mengikut tema.";}
+  else {gred="G";komen="Jangan putus asa. Mulakan dengan menyemak huraian satu per satu.";}
+
+  const jumlahMasa = masaItem.reduce((a,b)=>a+b,0);
+  el("gred-teks").textContent = "Gred " + gred;
+  el("markah-teks").innerHTML = betul + ' <span>/ ' + jum + '</span>';
+  el("komen-teks").textContent = komen;
+  el("masa-teks").textContent = "Jumlah masa menjawab: " + Math.floor(jumlahMasa/60) + " minit " + (jumlahMasa%60) + " saat";
+
+  const grid = el("ringkas-grid"); grid.innerHTML = "";
+  set.soalan.forEach((s,i)=>{
+    const d = document.createElement("button");
+    const jw = jawapanSaya[i];
+    d.className = "sel " + (jw ? (jw===s.j?"b":"s") : "k");
+    d.textContent = s.n;
+    d.title = jw ? ("Jawapan anda: "+jw+" | Kunci: "+s.j) : "Tidak dijawab";
+    d.onclick = ()=>{ idx=i; tunjuk("kuiz"); lukisSoalan(); };
+    grid.appendChild(d);
+  });
+  tunjuk("keputusan");
+  hantarJawapan();
+}
+
+function binaMuatan(){
+  const set = BANK[setSemasa];
+  return {
+    nama: murid.nama, kelas: murid.kelas,
+    set: setSemasa, namaSet: set.nama,
+    jumlah: set.soalan.length,
+    skor: set.soalan.reduce((a,s,i)=>a+(jawapanSaya[i]===s.j?1:0),0),
+    masaTotal: masaItem.reduce((a,b)=>a+b,0),
+    jawapan: jawapanSaya.map(x=>x||"-"),
+    kunci: set.soalan.map(s=>s.j),
+    masa: masaItem,
+    mula: mulaKuizPada.toISOString(),
+    tamat: new Date().toISOString()
+  };
+}
+async function hantarJawapan(){
+  const kotak = el("status-hantar");
+  if(typeof URL_APPS_SCRIPT === "undefined" || !URL_APPS_SCRIPT || URL_APPS_SCRIPT.indexOf("MASUKKAN")>-1){
+    kotak.innerHTML = `<div class="amaran">Pautan Google Sheet belum ditetapkan dalam fail <b>tetapan.js</b>. Keputusan anda tidak dihantar.</div>`;
+    return;
+  }
+  kotak.innerHTML = `<div class="jaya">Menghantar jawapan kepada cikgu&hellip;</div>`;
+  try{
+    const res = await fetch(URL_APPS_SCRIPT,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(binaMuatan())
+    });
+    const data = await res.json();
+    if(data && data.ok){
+      kotak.innerHTML = `<div class="jaya"><b>Jawapan berjaya dihantar.</b> Terima kasih, ${murid.nama}.</div>`;
+      el("btn-hantar-semula").hidden = true;
+    } else throw new Error("gagal");
+  }catch(err){
+    kotak.innerHTML = `<div class="amaran"><b>Jawapan belum sampai.</b> Pastikan anda ada talian internet, kemudian tekan <b>Hantar semula</b>. Jika masih gagal, beritahu cikgu.</div>`;
+    el("btn-hantar-semula").hidden = false;
+  }
+}
+el("btn-hantar-semula").onclick = hantarJawapan;
+
+/* ---------- CETAK ---------- */
+function bahagianCetak(kunci, sertaJawapanSaya){
+  const set = BANK[kunci];
+  let html = `<div class="cetak-tajuk">
+      <h2 style="margin:0;font-family:var(--serif)">${set.nama}</h2>
+      <p style="margin:4px 0 0;font-size:.9rem">Sejarah Kertas 1 (1249/1) &mdash; Soalan, Jawapan dan Huraian</p>
+      <p style="margin:4px 0 0;font-size:.85rem">Disediakan oleh Cikgu Muhammad Rabbani, SMK Dato' Undang Musa Al-Haj</p>
+      ${sertaJawapanSaya?`<p style="margin:6px 0 0;font-size:.9rem"><b>${murid.nama}</b> &middot; ${murid.kelas}</p>`:""}
+    </div>`;
+  set.soalan.forEach((s,i)=>{
+    const pilihan = HURUF.map(h=>`${h}. ${s.p[h]}`).join("<br>");
+    const salah = HURUF.filter(h=>h!==s.j).map(h=>`${h} &mdash; ${(s.salah&&s.salah[h])||"tidak menepati kehendak soalan."}`).join("<br>");
+    let baris = "";
+    if(sertaJawapanSaya){
+      const jw = jawapanSaya[i];
+      baris = `<div class="cs-jwp">Jawapan anda: <b>${jw||"tiada"}</b> ${jw?(jw===s.j?"(betul)":"(salah)"):""} &middot; masa ${masaItem[i]||0} saat</div>`;
+    }
+    html += `<div class="cetak-soalan">
+      <div class="cs-tajuk">${s.n}. ${s.s}</div>
+      ${s.stim?`<div style="border:1px solid #999;padding:6px;margin:6px 0;white-space:pre-line;font-size:.9rem">${s.stim}</div>`:""}
+      ${s.pilihanTambahan?`<div style="border:1px solid #999;padding:6px;margin:6px 0;white-space:pre-line;font-size:.9rem">${s.pilihanTambahan}</div>`:""}
+      <div class="cs-pil">${pilihan}</div>
+      ${baris}
+      <div class="cs-jwp"><b>Kunci: ${s.j}</b> &mdash; ${s.betul}</div>
+      <div class="cs-jwp" style="margin-top:4px"><i>Mengapa pilihan lain salah:</i><br>${salah}</div>
+      <div class="cs-jwp" style="margin-top:4px"><i>Klu:</i> ${s.klu}</div>
+      <div class="cs-jwp"><i>Rujukan:</i> Buku Teks Sejarah ${s.tk==="T4"?"Tingkatan 4":"Tingkatan 5"}, m/s ${s.ms}</div>
+    </div>`;
+  });
+  return html;
+}
+function cetakSet(kunci){ el("cetak").innerHTML = bahagianCetak(kunci,false); window.print(); }
+el("btn-cetak-keputusan").onclick = ()=>{ el("cetak").innerHTML = bahagianCetak(setSemasa,true); window.print(); };
+
+/* ---------- MULA ---------- */
+binaDaftar();
+binaMenu();
+</script>
+</body>
+</html>

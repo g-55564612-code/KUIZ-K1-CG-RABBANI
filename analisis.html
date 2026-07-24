@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analisis Item &mdash; Kuiz Sejarah Kertas 1</title>
+<style>
+:root{
+  --nila:#10243F;--nila-2:#1B3A5F;--emas:#C79A3C;--emas-lembut:#E8CF95;
+  --krim:#F7F2E4;--kertas:#FFFDF7;--jade:#1E7A5A;--jade-lembut:#DDF0E7;
+  --bata:#B3392F;--bata-lembut:#FBE3E0;--kelabu:#6C7A89;--garis:rgba(16,36,63,.14);
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);background:var(--krim);color:var(--nila);line-height:1.5}
+.songket{height:10px;background:repeating-linear-gradient(135deg,var(--emas) 0 8px,transparent 8px 16px),linear-gradient(var(--nila),var(--nila))}
+header.utama{background:var(--nila);color:var(--krim);padding:22px 20px}
+header.utama .eyebrow{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--emas-lembut);margin:0 0 8px}
+header.utama h1{font-family:var(--serif);font-weight:normal;font-size:clamp(1.4rem,4vw,2.1rem);margin:0}
+header.utama h1 em{color:var(--emas);font-style:normal}
+header.utama p.sub{margin:8px 0 0;font-size:.84rem;color:#CBD8E6}
+.bekas{max-width:1180px;margin:0 auto;padding:22px 16px 80px}
+button,select,input{font-family:inherit;font-size:.92rem}
+.btn{border:none;padding:10px 16px;border-radius:2px;font-weight:600;font-size:.86rem;cursor:pointer}
+.btn-utama{background:var(--nila);color:var(--krim)}
+.btn-emas{background:var(--emas);color:var(--nila)}
+.btn-garis{background:transparent;color:var(--nila);border:1.5px solid var(--nila)}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--emas);outline-offset:2px}
+.papan{background:var(--kertas);border:1px solid var(--garis);padding:18px;margin-bottom:22px}
+.papan h2{font-family:var(--serif);font-weight:normal;font-size:1.2rem;margin:0 0 4px}
+.papan .nota{font-size:.82rem;color:var(--kelabu);margin:0 0 16px}
+.alat{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.alat .medan{display:flex;flex-direction:column;gap:4px}
+.alat label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--kelabu);font-weight:700}
+.alat select,.alat input[type=file]{padding:9px;border:1.5px solid var(--garis);background:#fff;border-radius:2px;min-width:150px}
+.suis{display:flex;align-items:center;gap:8px;font-size:.85rem;padding-bottom:9px}
+.kad-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kad{background:#fff;border:1px solid var(--garis);border-top:4px solid var(--emas);padding:14px}
+.kad .angka{font-family:var(--serif);font-size:1.9rem;line-height:1.1}
+.kad .tajuk{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--kelabu);font-weight:700}
+.kad .kecil{font-size:.78rem;color:var(--kelabu)}
+.kad.merah{border-top-color:var(--bata)}
+.kad.hijau{border-top-color:var(--jade)}
+table{border-collapse:collapse;width:100%;font-size:.85rem;background:#fff}
+th,td{border:1px solid var(--garis);padding:6px 8px;text-align:left}
+th{background:var(--nila);color:var(--krim);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;position:sticky;top:0;z-index:2}
+tbody tr:nth-child(even){background:#FBF8EF}
+td.tengah,th.tengah{text-align:center}
+td.kunci{background:var(--jade-lembut);font-weight:700;color:var(--jade)}
+.skrol{overflow:auto;max-height:70vh;border:1px solid var(--garis)}
+.pill{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;background:#EFE7D2;color:#7A5F1C}
+.pill.bahaya{background:var(--bata-lembut);color:var(--bata)}
+.pill.baik{background:var(--jade-lembut);color:var(--jade)}
+.sel-j{font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.sel-j.b{background:var(--jade-lembut);color:var(--jade)}
+.sel-j.s{background:var(--bata-lembut);color:var(--bata)}
+.sel-j.k{background:#EFEFEF;color:var(--kelabu)}
+.nama-lekat{position:sticky;left:0;background:#fff;z-index:1;min-width:190px;font-size:.78rem}
+tbody tr:nth-child(even) .nama-lekat{background:#FBF8EF}
+.chip-nama{display:inline-block;font-size:.74rem;background:#fff;border:1px solid var(--garis);padding:2px 7px;margin:2px 3px 0 0;border-radius:2px}
+.chip-nama.b{border-color:var(--jade);color:var(--jade)}
+.chip-nama.s{border-color:var(--bata);color:var(--bata)}
+details{margin-top:6px}
+summary{cursor:pointer;font-size:.8rem;color:var(--nila-2);font-weight:600}
+.amaran{background:var(--bata-lembut);border-left:4px solid var(--bata);padding:10px 12px;font-size:.86rem;margin:12px 0}
+.jaya{background:var(--jade-lembut);border-left:4px solid var(--jade);padding:10px 12px;font-size:.86rem;margin:12px 0}
+.info{background:#FFFBF0;border-left:4px solid var(--emas);padding:10px 12px;font-size:.86rem;margin:12px 0}
+svg{max-width:100%;height:auto;display:block}
+.legend{font-size:.76rem;color:var(--kelabu);margin-top:6px}
+.pin-kotak{max-width:380px;margin:60px auto;background:var(--kertas);border:1px solid var(--garis);padding:24px;text-align:center}
+.pin-kotak input{width:100%;padding:12px;text-align:center;font-size:1.3rem;letter-spacing:.3em;border:1.5px solid var(--garis);margin:12px 0}
+footer.kaki{background:var(--nila);color:#BFCDDD;text-align:center;padding:20px;font-size:.8rem}
+footer.kaki a{color:var(--emas-lembut)}
+@media print{
+  header.utama,footer.kaki,.songket,.tiada-cetak{display:none !important}
+  body{background:#fff}
+  .papan{page-break-inside:avoid;border:none;padding:0;margin-bottom:18px}
+  .skrol{max-height:none;overflow:visible}
+  th{position:static}
+}
+</style>
+</head>
+<body>
+
+<div class="songket"></div>
+<header class="utama">
+  <p class="eyebrow">Panitia Sejarah &middot; SMK Dato' Undang Musa Al-Haj</p>
+  <h1>Analisis Item &amp; <em>Prestasi Murid</em></h1>
+  <p class="sub">Kuiz Sejarah Kertas 1 (1249/1) &middot; Cikgu Muhammad Rabbani</p>
+</header>
+<div class="songket"></div>
+
+<!-- ====== PIN ====== -->
+<div id="pin-skrin">
+  <div class="pin-kotak">
+    <h2 style="font-family:var(--serif);font-weight:normal;margin:0">Papan guru</h2>
+    <p style="font-size:.85rem;color:var(--kelabu);margin:6px 0 0">Masukkan PIN untuk melihat data murid.</p>
+    <input id="pin-input" type="password" inputmode="numeric" placeholder="PIN">
+    <button class="btn btn-utama" id="btn-pin" style="width:100%">Buka</button>
+    <p id="pin-ralat" class="amaran" hidden>PIN salah. Cuba lagi.</p>
+  </div>
+</div>
+
+<main class="bekas" id="papan-utama" hidden>
+
+  <!-- ====== ALAT ====== -->
+  <section class="papan tiada-cetak">
+    <h2>Sumber data</h2>
+    <p class="nota">Data diambil terus daripada Google Sheet. Jika rangkaian sekolah menyekat capaian, muat turun helaian sebagai CSV daripada Google Sheet dan muat naik di sini.</p>
+    <div class="alat">
+      <button class="btn btn-utama" id="btn-muat">Muat data dari Google Sheet</button>
+      <div class="medan">
+        <label for="fail-csv">atau muat naik CSV</label>
+        <input type="file" id="fail-csv" accept=".csv,text/csv">
+      </div>
+    </div>
+    <div id="status-muat"></div>
+  </section>
+
+  <!-- ====== TAPISAN ====== -->
+  <section class="papan tiada-cetak" id="papan-tapis" hidden>
+    <h2>Tapisan</h2>
+    <div class="alat">
+      <div class="medan"><label for="tapis-set">Set soalan</label><select id="tapis-set"></select></div>
+      <div class="medan"><label for="tapis-kelas">Kelas</label><select id="tapis-kelas"></select></div>
+      <div class="suis"><input type="checkbox" id="tapis-terakhir" checked><label for="tapis-terakhir" style="text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--nila)">Ambil percubaan terakhir sahaja bagi setiap murid</label></div>
+      <button class="btn btn-garis" id="btn-csv">Muat turun matriks CSV</button>
+      <button class="btn btn-emas" id="btn-cetak">Cetak laporan</button>
+    </div>
+  </section>
+
+  <div id="kandungan"></div>
+</main>
+
+<footer class="kaki">
+  <p style="margin:0"><a href="index.html">&larr; Kembali ke halaman kuiz murid</a></p>
+</footer>
+
+<script src="soalan.js"></script>
+<script src="tetapan.js"></script>
+<script>
+const el = id => document.getElementById(id);
+const HURUF = ["A","B","C","D"];
+let DATA = [];          // semua baris mentah
+let bersih = [];        // baris selepas tapisan
+
+/* ================= PIN ================= */
+el("btn-pin").onclick = ()=>{
+  if(el("pin-input").value.trim() === String(PIN_GURU)){
+    el("pin-skrin").hidden = true;
+    el("papan-utama").hidden = false;
+  } else el("pin-ralat").hidden = false;
+};
+el("pin-input").addEventListener("keydown",e=>{ if(e.key==="Enter") el("btn-pin").click(); });
+
+/* ================= MUAT DATA ================= */
+el("btn-muat").onclick = async ()=>{
+  const st = el("status-muat");
+  if(typeof URL_APPS_SCRIPT === "undefined" || URL_APPS_SCRIPT.indexOf("MASUKKAN")>-1){
+    st.innerHTML = `<div class="amaran">URL Web App belum ditetapkan dalam fail <b>tetapan.js</b>.</div>`;
+    return;
+  }
+  st.innerHTML = `<div class="info">Memuat data&hellip;</div>`;
+  try{
+    const res = await fetch(URL_APPS_SCRIPT + "?mode=data&t=" + Date.now());
+    const json = await res.json();
+    if(!json.ok) throw new Error(json.ralat||"gagal");
+    DATA = json.rows;
+    st.innerHTML = `<div class="jaya">${DATA.length} rekod dimuat pada ${new Date().toLocaleString("ms-MY")}.</div>`;
+    sediakanTapisan();
+  }catch(err){
+    st.innerHTML = `<div class="amaran">Tidak dapat menghubungi Google Sheet. Guna pilihan muat naik CSV di sebelah.<br><small>${err}</small></div>`;
+  }
+};
+
+el("fail-csv").onchange = (e)=>{
+  const fail = e.target.files[0];
+  if(!fail) return;
+  const pembaca = new FileReader();
+  pembaca.onload = ()=>{
+    try{
+      DATA = huraikanCSV(pembaca.result);
+      el("status-muat").innerHTML = `<div class="jaya">${DATA.length} rekod dibaca daripada fail ${fail.name}.</div>`;
+      sediakanTapisan();
+    }catch(err){
+      el("status-muat").innerHTML = `<div class="amaran">Fail CSV tidak dapat dibaca. Pastikan ia dimuat turun terus daripada helaian "Jawapan".</div>`;
+    }
+  };
+  pembaca.readAsText(fail,"utf-8");
+};
+
+function huraikanCSV(teks){
+  const baris = [];
+  let medan = "", rekod = [], dalamPetik = false;
+  for(let i=0;i<teks.length;i++){
+    const c = teks[i];
+    if(dalamPetik){
+      if(c === '"'){ if(teks[i+1] === '"'){ medan += '"'; i++; } else dalamPetik = false; }
+      else medan += c;
+    } else {
+      if(c === '"') dalamPetik = true;
+      else if(c === ','){ rekod.push(medan); medan = ""; }
+      else if(c === '\n'){ rekod.push(medan); baris.push(rekod); rekod = []; medan = ""; }
+      else if(c !== '\r') medan += c;
+    }
+  }
+  if(medan || rekod.length){ rekod.push(medan); baris.push(rekod); }
+  return baris.slice(1).filter(r=>r[1]).map(r=>({
+    masaHantar:r[0]||"", nama:(r[1]||"").trim(), kelas:(r[2]||"").trim(),
+    set:(r[3]||"").trim(), namaSet:(r[4]||"").trim(),
+    skor:Number(r[5])||0, jumlah:Number(r[6])||0, masaTotal:Number(r[7])||0,
+    mula:r[8]||"", tamat:r[9]||"",
+    jawapan:String(r[10]||"").split(",").filter(String),
+    masa:String(r[11]||"").split(",").filter(String).map(Number)
+  }));
+}
+
+/* ================= TAPISAN ================= */
+function sediakanTapisan(){
+  el("papan-tapis").hidden = false;
+  const set = el("tapis-set"), kelas = el("tapis-kelas");
+  const setAda = [...new Set(DATA.map(r=>r.set))].filter(s=>BANK[s]);
+  set.innerHTML = setAda.map(s=>`<option value="${s}">${BANK[s].nama}</option>`).join("")
+                  || Object.keys(BANK).map(s=>`<option value="${s}">${BANK[s].nama}</option>`).join("");
+  const kelasAda = [...new Set(DATA.map(r=>r.kelas))].filter(String).sort();
+  kelas.innerHTML = `<option value="">Semua kelas</option>` + kelasAda.map(k=>`<option>${k}</option>`).join("");
+  set.onchange = kelas.onchange = el("tapis-terakhir").onchange = papar;
+  papar();
+}
+
+function tapis(){
+  const s = el("tapis-set").value, k = el("tapis-kelas").value;
+  let r = DATA.filter(x=>x.set===s && (!k || x.kelas===k));
+  if(el("tapis-terakhir").checked){
+    const peta = new Map();
+    r.forEach(x=>{ peta.set(x.nama, x); });   // baris kemudian menimpa yang awal
+    r = [...peta.values()];
+  }
+  return r.sort((a,b)=>a.nama.localeCompare(b.nama));
+}
+
+/* ================= GRAF SVG ================= */
+function grafBar(op){
+  const {label, nilai, warna, tinggi=220, unit="", maks} = op;
+  const n = nilai.length;
+  const lebarBar = Math.max(14, Math.min(34, 900/n));
+  const lebar = Math.max(320, n*lebarBar + 60);
+  const atas = 14, bawah = 46, plot = tinggi - atas - bawah;
+  const puncak = maks || Math.max(1, ...nilai);
+  let g = `<svg viewBox="0 0 ${lebar} ${tinggi}" role="img">`;
+  [0,.25,.5,.75,1].forEach(p=>{
+    const y = atas + plot - plot*p;
+    g += `<line x1="46" y1="${y}" x2="${lebar}" y2="${y}" stroke="rgba(16,36,63,.12)"/>`;
+    g += `<text x="42" y="${y+4}" font-size="10" text-anchor="end" fill="#6C7A89">${Math.round(puncak*p)}${unit}</text>`;
+  });
+  nilai.forEach((v,i)=>{
+    const h = plot * (v/puncak);
+    const x = 50 + i*lebarBar;
+    const y = atas + plot - h;
+    const w = lebarBar - 4;
+    g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${warna(v,i)}"><title>${label[i]}: ${v}${unit}</title></rect>`;
+    if(n<=45) g += `<text x="${x+w/2}" y="${tinggi-30}" font-size="9" text-anchor="middle" fill="#10243F" transform="rotate(60 ${x+w/2} ${tinggi-28})">${label[i]}</text>`;
+  });
+  return g + `</svg>`;
+}
+const warnaPeratus = v => v>=70 ? "#1E7A5A" : (v>=40 ? "#C79A3C" : "#B3392F");
+
+/* ================= PAPARAN ================= */
+function papar(){
+  bersih = tapis();
+  const kunciSet = el("tapis-set").value;
+  const soalan = BANK[kunciSet].soalan;
+  const k = el("kandungan");
+  if(!bersih.length){ k.innerHTML = `<div class="papan"><div class="amaran">Tiada rekod bagi tapisan ini.</div></div>`; return; }
+
+  /* --- kiraan item --- */
+  const item = soalan.map((s,i)=>{
+    const kira = {A:0,B:0,C:0,D:0,"-":0}, nama = {A:[],B:[],C:[],D:[],"-":[]};
+    let masa = [];
+    bersih.forEach(r=>{
+      const j = r.jawapan[i] || "-";
+      if(kira[j]===undefined){ kira["-"]++; nama["-"].push(r.nama); }
+      else { kira[j]++; nama[j].push(r.nama); }
+      if(r.masa && r.masa[i]) masa.push(r.masa[i]);
+    });
+    const betul = kira[s.j];
+    return {
+      s, i, kira, nama,
+      betul,
+      peratus: Math.round(betul/bersih.length*100),
+      masaPurata: masa.length ? Math.round(masa.reduce((a,b)=>a+b,0)/masa.length) : 0
+    };
+  });
+
+  /* --- kiraan murid --- */
+  const murid = bersih.map(r=>{
+    const salah = [];
+    soalan.forEach((s,i)=>{ if(r.jawapan[i] !== s.j) salah.push(s.n); });
+    const tema = {};
+    soalan.forEach((s,i)=>{
+      tema[s.bab] = tema[s.bab] || {b:0,j:0};
+      tema[s.bab].j++;
+      if(r.jawapan[i]===s.j) tema[s.bab].b++;
+    });
+    const lemah = Object.keys(tema).filter(t=>tema[t].b/tema[t].j < 0.5).slice(0,3);
+    return {r, salah, lemah, peratus: Math.round(r.skor/soalan.length*100)};
+  }).sort((a,b)=>b.r.skor-a.r.skor);
+
+  /* --- kiraan tema --- */
+  const temaKira = {};
+  soalan.forEach((s,i)=>{
+    temaKira[s.bab] = temaKira[s.bab] || {b:0,j:0,tk:s.tk,soalan:[]};
+    temaKira[s.bab].soalan.push(s.n);
+    bersih.forEach(r=>{ temaKira[s.bab].j++; if(r.jawapan[i]===s.j) temaKira[s.bab].b++; });
+  });
+  const temaSenarai = Object.keys(temaKira).map(t=>({
+    nama:t, tk:temaKira[t].tk, soalan:temaKira[t].soalan,
+    peratus: Math.round(temaKira[t].b/temaKira[t].j*100)
+  })).sort((a,b)=>a.peratus-b.peratus);
+
+  /* --- ringkasan --- */
+  const puratSkor = Math.round(bersih.reduce((a,r)=>a+r.skor,0)/bersih.length*10)/10;
+  const puratMasa = Math.round(bersih.reduce((a,r)=>a+r.masaTotal,0)/bersih.length);
+  const senaraiKelas = KELAS[el("tapis-kelas").value] || [];
+  const sudah = new Set(bersih.map(r=>r.nama));
+  const belum = senaraiKelas.filter(n=>!sudah.has(n));
+  const itemSukar = [...item].sort((a,b)=>a.peratus-b.peratus).slice(0,5);
+  const itemLambat = [...item].sort((a,b)=>b.masaPurata-a.masaPurata).slice(0,5);
+
+  let h = "";
+
+  /* ---- kad ringkasan ---- */
+  h += `<section class="papan"><h2>Ringkasan</h2>
+    <p class="nota">${BANK[kunciSet].nama} &middot; ${el("tapis-kelas").value||"semua kelas"} &middot; ${bersih.length} murid</p>
+    <div class="kad-grid">
+      <div class="kad"><div class="tajuk">Murid menjawab</div><div class="angka">${bersih.length}</div>
+        <div class="kecil">${belum.length? belum.length+" belum menjawab" : "senarai kelas lengkap"}</div></div>
+      <div class="kad ${puratSkor/soalan.length>=0.6?"hijau":"merah"}"><div class="tajuk">Purata skor</div>
+        <div class="angka">${puratSkor}<span style="font-size:.9rem;color:var(--kelabu)"> / ${soalan.length}</span></div>
+        <div class="kecil">${Math.round(puratSkor/soalan.length*100)}%</div></div>
+      <div class="kad"><div class="tajuk">Purata masa</div><div class="angka">${Math.floor(puratMasa/60)}<span style="font-size:.9rem;color:var(--kelabu)"> min</span></div>
+        <div class="kecil">${puratMasa%60} saat</div></div>
+      <div class="kad merah"><div class="tajuk">Item paling sukar</div><div class="angka">S${itemSukar[0].s.n}</div>
+        <div class="kecil">${itemSukar[0].peratus}% betul &middot; ${itemSukar[0].s.bab}</div></div>
+      <div class="kad merah"><div class="tajuk">Tema paling lemah</div><div class="angka" style="font-size:1.05rem;font-family:var(--sans);font-weight:700">${temaSenarai[0].nama}</div>
+        <div class="kecil">${temaSenarai[0].peratus}% betul</div></div>
+    </div>`;
+  if(belum.length){
+    h += `<details open><summary>${belum.length} murid belum menjawab</summary>
+      <div style="margin-top:6px">${belum.map(n=>`<span class="chip-nama">${n}</span>`).join("")}</div></details>`;
+  }
+  h += `</section>`;
+
+  /* ---- graf peratus betul setiap item ---- */
+  h += `<section class="papan"><h2>Peratus betul mengikut soalan</h2>
+    <p class="nota">Hijau 70% ke atas &middot; kuning 40&ndash;69% &middot; merah bawah 40% (item yang perlu diajar semula)</p>
+    ${grafBar({label:item.map(x=>"S"+x.s.n), nilai:item.map(x=>x.peratus), warna:warnaPeratus, unit:"%", maks:100})}
+  </section>`;
+
+  /* ---- jadual analisis item ---- */
+  h += `<section class="papan"><h2>Analisis item</h2>
+    <p class="nota">Bilangan murid bagi setiap pilihan. Sel hijau ialah kunci jawapan. Buka "Siapa jawab apa" untuk melihat nama.</p>
+    <div class="skrol"><table><thead><tr>
+      <th class="tengah">S</th><th>Tema</th><th class="tengah">Ting.</th><th class="tengah">Aras</th><th class="tengah">Kunci</th>
+      <th class="tengah">A</th><th class="tengah">B</th><th class="tengah">C</th><th class="tengah">D</th>
+      <th class="tengah">Tiada</th><th class="tengah">% Betul</th><th class="tengah">Purata masa</th><th>Nama mengikut pilihan</th>
+    </tr></thead><tbody>`;
+  item.forEach(x=>{
+    h += `<tr>
+      <td class="tengah"><b>${x.s.n}</b></td>
+      <td>${x.s.bab}</td>
+      <td class="tengah">${x.s.tk}</td>
+      <td class="tengah">${x.s.aras||"-"}</td>
+      <td class="tengah"><b>${x.s.j}</b></td>
+      ${HURUF.map(hh=>`<td class="tengah ${hh===x.s.j?"kunci":""}">${x.kira[hh]}</td>`).join("")}
+      <td class="tengah">${x.kira["-"]}</td>
+      <td class="tengah"><span class="pill ${x.peratus>=70?"baik":(x.peratus<40?"bahaya":"")}">${x.peratus}%</span></td>
+      <td class="tengah">${x.masaPurata}s</td>
+      <td><details><summary>Siapa jawab apa</summary>
+        ${HURUF.map(hh=>`<div style="margin-top:4px"><b>${hh}${hh===x.s.j?" (kunci)":""}:</b> ${
+          x.nama[hh].length ? x.nama[hh].map(n=>`<span class="chip-nama ${hh===x.s.j?"b":"s"}">${n}</span>`).join("") : "<i>tiada</i>"
+        }</div>`).join("")}
+      </details></td>
+    </tr>`;
+  });
+  h += `</tbody></table></div></section>`;
+
+  /* ---- tema ---- */
+  h += `<section class="papan"><h2>Kekuatan dan kelemahan mengikut tema</h2>
+    <p class="nota">Disusun daripada tema paling lemah. Guna senarai ini untuk merancang pengajaran pemulihan.</p>
+    ${grafBar({label:temaSenarai.map(t=>t.nama.length>16?t.nama.slice(0,15)+"\u2026":t.nama), nilai:temaSenarai.map(t=>t.peratus), warna:warnaPeratus, unit:"%", maks:100, tinggi:260})}
+    <div class="skrol" style="max-height:340px;margin-top:12px"><table><thead><tr>
+      <th>Tema</th><th class="tengah">Tingkatan</th><th class="tengah">Soalan</th><th class="tengah">% Betul</th><th class="tengah">Tindakan</th>
+    </tr></thead><tbody>
+    ${temaSenarai.map(t=>`<tr>
+      <td>${t.nama}</td><td class="tengah">${t.tk}</td><td class="tengah">${t.soalan.join(", ")}</td>
+      <td class="tengah"><span class="pill ${t.peratus>=70?"baik":(t.peratus<40?"bahaya":"")}">${t.peratus}%</span></td>
+      <td class="tengah">${t.peratus<40?"Ajar semula":(t.peratus<70?"Latih tubi tambahan":"Kukuh")}</td>
+    </tr>`).join("")}
+    </tbody></table></div></section>`;
+
+  /* ---- masa ---- */
+  h += `<section class="papan"><h2>Masa menjawab setiap soalan</h2>
+    <p class="nota">Purata saat bagi setiap item. Item yang mengambil masa lama biasanya menunjukkan murid teragak-agak.</p>
+    ${grafBar({label:item.map(x=>"S"+x.s.n), nilai:item.map(x=>x.masaPurata), warna:()=> "#1B3A5F", unit:"s"})}
+    <div class="legend">Lima item paling lambat: ${itemLambat.map(x=>"S"+x.s.n+" ("+x.masaPurata+"s)").join(", ")}</div>
+  </section>`;
+
+  /* ---- skor murid ---- */
+  h += `<section class="papan"><h2>Skor setiap murid</h2>
+    ${grafBar({label:murid.map(m=>ringkasNama(m.r.nama)), nilai:murid.map(m=>m.peratus), warna:warnaPeratus, unit:"%", maks:100, tinggi:280})}
+  </section>`;
+
+  /* ---- matriks murid x soalan ---- */
+  h += `<section class="papan"><h2>Matriks jawapan murid</h2>
+    <p class="nota">Huruf yang dipilih oleh setiap murid. Hijau betul, merah salah, kelabu tidak dijawab.</p>
+    <div class="skrol"><table><thead><tr>
+      <th class="nama-lekat" style="background:var(--nila);color:var(--krim)">Nama</th>
+      <th class="tengah">Skor</th><th class="tengah">Masa</th>
+      ${soalan.map(s=>`<th class="tengah" title="${s.bab}">${s.n}</th>`).join("")}
+    </tr></thead><tbody>
+    ${murid.map(m=>`<tr>
+      <td class="nama-lekat">${m.r.nama}</td>
+      <td class="tengah"><b>${m.r.skor}</b></td>
+      <td class="tengah">${Math.floor(m.r.masaTotal/60)}m</td>
+      ${soalan.map((s,i)=>{
+        const j = m.r.jawapan[i] || "-";
+        const kelas = j==="-" ? "k" : (j===s.j ? "b" : "s");
+        return `<td class="sel-j ${kelas}" title="S${s.n} | kunci ${s.j} | masa ${m.r.masa[i]||0}s">${j}</td>`;
+      }).join("")}
+    </tr>`).join("")}
+    </tbody></table></div></section>`;
+
+  /* ---- senarai murid ---- */
+  h += `<section class="papan"><h2>Prestasi individu</h2>
+    <div class="skrol"><table><thead><tr>
+      <th>Nama</th><th class="tengah">Skor</th><th class="tengah">%</th><th class="tengah">Masa</th>
+      <th>Soalan yang salah</th><th>Tema yang lemah</th>
+    </tr></thead><tbody>
+    ${murid.map(m=>`<tr>
+      <td>${m.r.nama}</td>
+      <td class="tengah"><b>${m.r.skor}</b>/${soalan.length}</td>
+      <td class="tengah"><span class="pill ${m.peratus>=70?"baik":(m.peratus<40?"bahaya":"")}">${m.peratus}%</span></td>
+      <td class="tengah">${Math.floor(m.r.masaTotal/60)}m ${m.r.masaTotal%60}s</td>
+      <td style="font-size:.78rem">${m.salah.join(", ")||"<i>tiada</i>"}</td>
+      <td style="font-size:.78rem">${m.lemah.join(" &middot; ")||"<i>tiada</i>"}</td>
+    </tr>`).join("")}
+    </tbody></table></div></section>`;
+
+  k.innerHTML = h;
+}
+
+function ringkasNama(n){
+  const p = n.split(" ");
+  return p.length>2 ? p[0]+" "+p[1] : n;
+}
+
+/* ================= EKSPORT ================= */
+el("btn-csv").onclick = ()=>{
+  const soalan = BANK[el("tapis-set").value].soalan;
+  const baris = [["Nama","Kelas","Skor","Jumlah","Masa (saat)"].concat(soalan.map(s=>"S"+s.n)).concat(soalan.map(s=>"Masa S"+s.n))];
+  bersih.forEach(r=>{
+    baris.push([r.nama,r.kelas,r.skor,soalan.length,r.masaTotal]
+      .concat(soalan.map((s,i)=>r.jawapan[i]||"-"))
+      .concat(soalan.map((s,i)=>r.masa[i]||0)));
+  });
+  const csv = baris.map(b=>b.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));
+  a.download = "matriks-" + el("tapis-set").value + ".csv";
+  a.click();
+};
+el("btn-cetak").onclick = ()=>window.print();
+</script>
+</body>
+</html>
