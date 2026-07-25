@@ -109,6 +109,13 @@ button{font-family:inherit;font-size:1rem;cursor:pointer}
 .sel.b{background:var(--jade-lembut);border-color:var(--jade);color:var(--jade)}
 .sel.s{background:var(--bata-lembut);border-color:var(--bata);color:var(--bata)}
 .sel.k{color:var(--kelabu)}
+.sel{cursor:pointer}
+.sel.dijawab{background:var(--nila);border-color:var(--nila);color:var(--krim)}
+.sel.kosong{background:#fff;color:var(--kelabu)}
+.sel.kini{outline:3px solid var(--emas);outline-offset:1px}
+/* pilihan dalam mod jawab */
+.pilihan.dipilih{border-color:var(--nila);background:#EEF3F9}
+.pilihan.dipilih .huruf{background:var(--nila);border-color:var(--nila);color:var(--krim)}
 #cetak{display:none}
 .cetak-tajuk{text-align:center;margin-bottom:18px}
 .cetak-soalan{margin-bottom:16px;page-break-inside:avoid;border-bottom:1px solid #ccc;padding-bottom:12px}
@@ -142,8 +149,10 @@ footer.kaki a{color:var(--emas-lembut)}
 
   <!-- ============ DAFTAR NAMA ============ -->
   <section id="daftar">
+    <div id="sambung-banner" hidden></div>
     <div class="intro">
-      <p><b>Sebelum mula:</b> pilih kelas dan nama anda. Markah, jawapan setiap soalan dan masa menjawab akan dihantar kepada cikgu secara automatik selepas kuiz tamat.</p>
+      <p><b>Sebelum mula:</b> pilih kelas dan nama anda. Jawab kesemua soalan dahulu &mdash; jawapan boleh ditukar bila-bila masa. Markah, skema jawapan dan huraian hanya dipapar <b>selepas anda menekan Hantar</b>.</p>
+      <p style="margin:0">Jika anda terputus atau terkeluar semasa menjawab, kuiz anda disimpan dan boleh disambung semula.</p>
     </div>
     <div class="borang">
       <h2 class="tajuk-seksyen">Pengenalan diri</h2>
@@ -168,7 +177,7 @@ footer.kaki a{color:var(--emas-lembut)}
   <section id="menu" hidden>
     <div class="intro">
       <p><b id="salam-nama"></b></p>
-      <p>Pilih satu set. Jawapan sebenar dan huraian hanya keluar <b>selepas</b> anda membuat pilihan, dan pilihan tidak boleh ditukar &mdash; jawab dengan teliti.</p>
+      <p>Pilih satu set. Jawab semua soalan, tukar jawapan jika perlu, kemudian tekan <b>Hantar</b>. Markah dan huraian akan dipapar selepas itu.</p>
     </div>
     <h2 class="tajuk-seksyen">Pilih set soalan</h2>
     <div class="grid-set" id="senarai-set"></div>
@@ -195,8 +204,16 @@ footer.kaki a{color:var(--emas-lembut)}
       <div class="nav-bawah">
         <button class="btn btn-garis" id="btn-sebelum">&larr; Soalan sebelum</button>
         <div class="kanan">
-          <button class="btn btn-utama" id="btn-seterus">Soalan seterusnya &rarr;</button>
+          <button class="btn btn-garis" id="btn-seterus">Soalan seterusnya &rarr;</button>
+          <button class="btn btn-emas" id="btn-hantar" hidden>Semak &amp; hantar</button>
+          <button class="btn btn-utama" id="btn-semak-keluar" hidden>Kembali ke keputusan</button>
         </div>
+      </div>
+
+      <div id="navigator-kotak" style="margin-top:22px">
+        <div style="font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--kelabu);font-weight:700;margin-bottom:8px">Peta soalan &middot; tekan untuk lompat</div>
+        <div class="ringkas-grid" id="navigator"></div>
+        <p style="font-size:.8rem;color:var(--kelabu);margin:10px 0 0" id="nav-kira"></p>
       </div>
     </div>
   </section>
@@ -233,12 +250,35 @@ footer.kaki a{color:var(--emas-lembut)}
 <script src="tetapan.js"></script>
 <script>
 /* =========================================================
-   ENJIN KUIZ
+   ENJIN KUIZ  (mod jawab dahulu, semak selepas hantar)
    ========================================================= */
 const el = id => document.getElementById(id);
 const HURUF = ["A","B","C","D"];
-let setSemasa=null, idx=0, jawapanSaya=[], masaItem=[], mulaItem=0, mulaKuizPada=null, jamTimer=null;
+const KUNCI_SIMPAN = "kuiz_sejarah_progres";
+
+let setSemasa=null, idx=0, jawapanSaya=[], masaItem=[], mulaItem=0,
+    mulaKuizPada=null, jamTimer=null;
+let mod = "jawab";          // "jawab" = sedang menjawab ; "semak" = selepas hantar
 let murid = {nama:"", kelas:""};
+let dahHantar = false;
+
+/* ---------- SIMPANAN (untuk sambung selepas terkeluar) ---------- */
+function simpanProgres(){
+  if(mod!=="jawab" || !setSemasa) return;
+  rakamMasaItem();
+  try{
+    localStorage.setItem(KUNCI_SIMPAN, JSON.stringify({
+      nama:murid.nama, kelas:murid.kelas, set:setSemasa, idx:idx,
+      jawapan:jawapanSaya, masa:masaItem,
+      mula: mulaKuizPada ? mulaKuizPada.toISOString() : null
+    }));
+  }catch(e){/* localStorage disekat — abaikan */}
+}
+function buangProgres(){ try{ localStorage.removeItem(KUNCI_SIMPAN); }catch(e){} }
+function bacaProgres(){
+  try{ const t = localStorage.getItem(KUNCI_SIMPAN); return t ? JSON.parse(t) : null; }
+  catch(e){ return null; }
+}
 
 /* ---------- DAFTAR ---------- */
 function binaDaftar(){
@@ -260,7 +300,43 @@ function binaDaftar(){
   };
   sn.onchange = ()=>{ el("medan-lain").hidden = (sn.value!=="LAIN"); };
   sk.onchange();
+  paparSambung();
 }
+
+function paparSambung(){
+  const p = bacaProgres();
+  const kotak = el("sambung-banner");
+  if(!p || !p.set || !BANK[p.set]){ kotak.hidden = true; return; }
+  const dijawab = (p.jawapan||[]).filter(Boolean).length;
+  kotak.hidden = false;
+  kotak.innerHTML = `
+    <div class="jaya" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+      <span>Anda ada kuiz yang belum selesai: <b>${p.nama}</b> &middot; ${BANK[p.set].nama}
+        (${dijawab}/${BANK[p.set].soalan.length} dijawab).</span>
+      <span style="display:flex;gap:8px">
+        <button class="btn btn-utama" id="btn-sambung">Sambung kuiz</button>
+        <button class="btn btn-garis" id="btn-buang">Mula baharu</button>
+      </span>
+    </div>`;
+  el("btn-sambung").onclick = ()=>sambungProgres(p);
+  el("btn-buang").onclick = ()=>{ buangProgres(); paparSambung(); };
+}
+
+function sambungProgres(p){
+  murid = {nama:p.nama, kelas:p.kelas};
+  setSemasa = p.set;
+  jawapanSaya = p.jawapan && p.jawapan.length ? p.jawapan.slice() : new Array(BANK[p.set].soalan.length).fill(null);
+  masaItem = p.masa && p.masa.length ? p.masa.slice() : new Array(BANK[p.set].soalan.length).fill(0);
+  idx = p.idx || 0;
+  mulaKuizPada = p.mula ? new Date(p.mula) : new Date();
+  mod = "jawab"; dahHantar = false;
+  el("salam-nama").textContent = murid.nama + "  \u00b7  " + murid.kelas;
+  el("label-set").textContent = BANK[setSemasa].nama;
+  jalankanJam();
+  tunjuk("kuiz");
+  lukisSoalan();
+}
+
 el("btn-daftar").onclick = ()=>{
   const kelas = el("pilih-kelas").value;
   let nama = el("pilih-nama").value;
@@ -272,12 +348,13 @@ el("btn-daftar").onclick = ()=>{
     return;
   }
   ralat.hidden = true;
-  murid = {nama:nama, kelas:(kelas==="LAIN"? el("nama-lain").dataset.kelas || "LAIN" : kelas)};
-  if(kelas==="LAIN") murid.kelas = prompt("Taip nama kelas anda:","") || "LAIN";
+  let kelasAkhir = kelas;
+  if(kelas==="LAIN") kelasAkhir = prompt("Taip nama kelas anda:","") || "LAIN";
+  murid = {nama:nama, kelas:kelasAkhir};
   el("salam-nama").textContent = murid.nama + "  \u00b7  " + murid.kelas;
   tunjuk("menu");
 };
-el("btn-tukar-nama").onclick = ()=>tunjuk("daftar");
+el("btn-tukar-nama").onclick = ()=>{ paparSambung(); tunjuk("daftar"); };
 
 /* ---------- MENU ---------- */
 function binaMenu(){
@@ -306,26 +383,44 @@ function tunjuk(bahagian){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-/* ---------- KUIZ ---------- */
+/* ---------- MULA KUIZ ---------- */
 function mulaKuiz(kunci){
-  setSemasa = kunci; idx = 0;
+  const sedia = bacaProgres();
+  if(sedia && sedia.set===kunci && sedia.nama===murid.nama){
+    if(confirm("Anda ada kuiz set ini yang belum selesai. Tekan OK untuk menyambung, atau Cancel untuk mula semula.")){
+      sambungProgres(sedia); return;
+    }
+    buangProgres();
+  }
+  setSemasa = kunci; idx = 0; mod = "jawab"; dahHantar = false;
   const jum = BANK[kunci].soalan.length;
   jawapanSaya = new Array(jum).fill(null);
   masaItem = new Array(jum).fill(0);
   mulaKuizPada = new Date();
   el("label-set").textContent = BANK[kunci].nama;
-  el("btn-hantar-semula").hidden = true;
   jalankanJam();
+  simpanProgres();
   tunjuk("kuiz");
   lukisSoalan();
 }
 function jalankanJam(){
   clearInterval(jamTimer);
+  el("jam").hidden = false;
   jamTimer = setInterval(()=>{
     const s = Math.floor((Date.now()-mulaKuizPada.getTime())/1000);
     el("jam").textContent = String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
   },1000);
 }
+
+/* ---------- MASA SETIAP ITEM (kumulatif, sokong lawatan semula) ---------- */
+function rakamMasaItem(){
+  if(mod!=="jawab" || mulaItem===0) return;
+  const tambah = Math.round((Date.now()-mulaItem)/1000);
+  if(tambah>0) masaItem[idx] = (masaItem[idx]||0) + tambah;
+  mulaItem = Date.now();
+}
+
+/* ---------- LUKIS SOALAN ---------- */
 function lukisSoalan(){
   const set = BANK[setSemasa], sl = set.soalan[idx];
   mulaItem = Date.now();
@@ -336,7 +431,6 @@ function lukisSoalan(){
     la.textContent = "Aras " + ({R:"Rendah",S:"Sederhana",T:"Tinggi"}[sl.aras]); }
   else la.hidden = true;
   el("bar-progres").style.width = ((idx+1)/set.soalan.length*100)+"%";
-  kemasSkor();
 
   const dipilih = jawapanSaya[idx];
   let html = "";
@@ -347,7 +441,10 @@ function lukisSoalan(){
   html += `<p class="teks-soalan">${sl.s}</p>`;
   if(sl.pilihanTambahan) html += `<div class="stim">${sl.pilihanTambahan}</div>`;
   html += `<div class="senarai-pilihan">`;
-  HURUF.forEach(h=>{ html += `<button class="pilihan" data-h="${h}"><span class="huruf">${h}</span><span>${sl.p[h]}</span></button>`; });
+  HURUF.forEach(h=>{
+    const tanda = (mod==="jawab" && dipilih===h) ? " dipilih" : "";
+    html += `<button class="pilihan${tanda}" data-h="${h}"><span class="huruf">${h}</span><span>${sl.p[h]}</span></button>`;
+  });
   html += `</div>
     <div class="kotak-klu">
       <button class="btn btn-garis" id="btn-klu">&#128161; Tunjuk klu</button>
@@ -361,35 +458,77 @@ function lukisSoalan(){
     el("btn-klu").innerHTML = k.hidden ? "&#128161; Tunjuk klu" : "&#128161; Sembunyi klu";
   };
   el("kad-soalan").querySelectorAll(".pilihan").forEach(b=>b.onclick=()=>pilih(b.dataset.h));
-  if(dipilih) dedah(dipilih,false);
+
+  if(mod==="semak"){ dedah(dipilih); }
 
   el("btn-sebelum").disabled = (idx===0);
-  el("btn-seterus").textContent = (idx===set.soalan.length-1) ? "Tamat & hantar jawapan" : "Soalan seterusnya \u2192";
+  const akhir = (idx===set.soalan.length-1);
+  if(mod==="jawab"){
+    el("btn-seterus").hidden = akhir;
+    el("btn-hantar").hidden = !akhir;
+    el("btn-semak-keluar").hidden = true;
+    el("navigator-kotak").hidden = false;
+  } else { // semak
+    el("btn-seterus").hidden = akhir;
+    el("btn-hantar").hidden = true;
+    el("btn-semak-keluar").hidden = false;
+    el("navigator-kotak").hidden = false;
+  }
+  binaNavigator();
 }
+
+/* ---------- PILIH (boleh tukar, tiada pendedahan) ---------- */
 function pilih(h){
-  if(jawapanSaya[idx]) return;
+  if(mod!=="jawab") return;
   jawapanSaya[idx] = h;
-  masaItem[idx] = Math.max(1, Math.round((Date.now()-mulaItem)/1000));
-  dedah(h,true);
-  kemasSkor();
+  el("kad-soalan").querySelectorAll(".pilihan").forEach(b=>{
+    b.classList.toggle("dipilih", b.dataset.h===h);
+  });
+  simpanProgres();
+  binaNavigator();
 }
-function dedah(dipilih,animasi){
+
+/* ---------- PETA SOALAN / NAVIGATOR ---------- */
+function binaNavigator(){
+  const set = BANK[setSemasa];
+  const nav = el("navigator");
+  nav.innerHTML = "";
+  set.soalan.forEach((s,i)=>{
+    const d = document.createElement("button");
+    let kelas = "sel ";
+    if(mod==="semak"){ kelas += jawapanSaya[i] ? (jawapanSaya[i]===s.j?"b":"s") : "k"; }
+    else { kelas += jawapanSaya[i] ? "dijawab" : "kosong"; }
+    if(i===idx) kelas += " kini";
+    d.className = kelas;
+    d.textContent = s.n;
+    d.onclick = ()=>{ rakamMasaItem(); idx=i; lukisSoalan(); window.scrollTo({top:0,behavior:"smooth"}); };
+    nav.appendChild(d);
+  });
+  const dijawab = jawapanSaya.filter(Boolean).length;
+  el("nav-kira").textContent = mod==="jawab"
+    ? `${dijawab} daripada ${set.soalan.length} soalan telah dijawab.`
+    : `Tekan mana-mana nombor untuk menyemak semula soalan itu.`;
+}
+
+/* ---------- PENDEDAHAN (mod semak sahaja) ---------- */
+function dedah(dipilih){
   const sl = BANK[setSemasa].soalan[idx];
   const betul = (dipilih===sl.j);
   el("kad-soalan").querySelectorAll(".pilihan").forEach(b=>{
-    const h = b.dataset.h; b.disabled = true;
+    const h = b.dataset.h; b.disabled = true; b.classList.remove("dipilih");
     if(h===sl.j) b.classList.add("betul");
     else if(h===dipilih) b.classList.add("salah");
     else b.classList.add("pudar");
-    if(!animasi) b.style.animation = "none";
   });
   const senarai = HURUF.filter(h=>h!==sl.j).map(h=>{
     const sebab = (sl.salah && sl.salah[h]) || "Tidak menepati kehendak soalan.";
     return `<li><span class="h">${h}</span><span>${sebab}</span></li>`;
   }).join("");
+  const jwpAnda = dipilih ? `Jawapan anda: <b>${dipilih}</b>` : `<b>Anda tidak menjawab soalan ini.</b>`;
   el("maklumbalas").innerHTML = `
     <div class="maklumbalas">
-      <span class="cop ${betul?"ya":"tak"}" ${animasi?"":'style="animation:none"'}>${betul?"Betul":"Belum tepat"}</span>
+      <span class="cop ${betul?"ya":"tak"}">${betul?"Betul":"Belum tepat"}</span>
+      <p style="font-size:.86rem;color:var(--kelabu);margin:8px 0 0">${jwpAnda}</p>
       <div class="panel jawapan">
         <h4>Jawapan sebenar</h4>
         <p><span class="kunci">${sl.j}</span> &nbsp; ${sl.p[sl.j]}</p>
@@ -402,25 +541,45 @@ function dedah(dipilih,animasi){
       <div class="rujukan">Rujukan: <b>Buku Teks Sejarah ${sl.tk==="T4"?"Tingkatan 4":"Tingkatan 5"}, muka surat ${sl.ms}</b> &nbsp;&middot;&nbsp; Tema: ${sl.bab}</div>
     </div>`;
 }
-function kemasSkor(){
-  const set = BANK[setSemasa]; let betul=0, dijawab=0;
-  set.soalan.forEach((s,i)=>{ if(jawapanSaya[i]){ dijawab++; if(jawapanSaya[i]===s.j) betul++; } });
-  el("papar-skor").textContent = betul + " / " + dijawab;
+
+/* ---------- NAVIGASI ---------- */
+el("btn-seterus").onclick = ()=>{ rakamMasaItem(); if(idx<BANK[setSemasa].soalan.length-1){ idx++; lukisSoalan(); } };
+el("btn-sebelum").onclick = ()=>{ rakamMasaItem(); if(idx>0){ idx--; lukisSoalan(); } };
+el("btn-balik").onclick = ()=>{
+  rakamMasaItem();
+  if(mod==="semak"){ tunjuk("keputusan"); return; }
+  if(idx>0){ idx--; lukisSoalan(); } else tunjuk("menu");
+};
+el("btn-menu").onclick = ()=>{
+  rakamMasaItem();
+  if(mod==="jawab"){
+    if(!confirm("Kembali ke menu? Kuiz anda disimpan dan boleh disambung kemudian.")) return;
+    simpanProgres();
+  }
+  clearInterval(jamTimer); tunjuk("menu");
+};
+el("btn-semak-keluar").onclick = ()=>tunjuk("keputusan");
+
+/* ---------- HANTAR ---------- */
+el("btn-hantar").onclick = ()=>{
+  rakamMasaItem();
+  const belum = jawapanSaya.filter(x=>!x).length;
+  let mesej = "Hantar jawapan sekarang?\n\nSelepas hantar, jawapan tidak boleh ditukar dan markah serta huraian akan dipapar.";
+  if(belum>0) mesej = `Anda masih ada ${belum} soalan yang belum dijawab.\n\n` + mesej;
+  if(!confirm(mesej)) return;
+  hantarDanSemak();
+};
+
+function hantarDanSemak(){
+  clearInterval(jamTimer);
+  mod = "semak"; dahHantar = true;
+  buangProgres();                 // kuiz selesai — tiada lagi sambung
+  paparKeputusan();
+  hantarJawapan();
 }
 
-el("btn-seterus").onclick = ()=>{
-  const set = BANK[setSemasa];
-  if(idx===set.soalan.length-1) paparKeputusan(); else { idx++; lukisSoalan(); }
-};
-el("btn-sebelum").onclick = ()=>{ if(idx>0){ idx--; lukisSoalan(); } };
-el("btn-balik").onclick = ()=>{ if(idx>0){ idx--; lukisSoalan(); } else tunjuk("menu"); };
-el("btn-menu").onclick = ()=>{ clearInterval(jamTimer); tunjuk("menu"); };
-el("btn-menu2").onclick = ()=>tunjuk("menu");
-el("btn-ulang").onclick = ()=>mulaKuiz(setSemasa);
-
-/* ---------- KEPUTUSAN + HANTAR ---------- */
+/* ---------- KEPUTUSAN ---------- */
 function paparKeputusan(){
-  clearInterval(jamTimer);
   const set = BANK[setSemasa];
   let betul = 0;
   set.soalan.forEach((s,i)=>{ if(jawapanSaya[i]===s.j) betul++; });
@@ -434,7 +593,7 @@ function paparKeputusan(){
   else if(peratus>=40){gred="E";komen="Perlu ulang kaji menyeluruh mengikut tema.";}
   else {gred="G";komen="Jangan putus asa. Mulakan dengan menyemak huraian satu per satu.";}
 
-  const jumlahMasa = masaItem.reduce((a,b)=>a+b,0);
+  const jumlahMasa = masaItem.reduce((a,b)=>a+(b||0),0);
   el("gred-teks").textContent = "Gred " + gred;
   el("markah-teks").innerHTML = betul + ' <span>/ ' + jum + '</span>';
   el("komen-teks").textContent = komen;
@@ -447,13 +606,13 @@ function paparKeputusan(){
     d.className = "sel " + (jw ? (jw===s.j?"b":"s") : "k");
     d.textContent = s.n;
     d.title = jw ? ("Jawapan anda: "+jw+" | Kunci: "+s.j) : "Tidak dijawab";
-    d.onclick = ()=>{ idx=i; tunjuk("kuiz"); lukisSoalan(); };
+    d.onclick = ()=>{ idx=i; mod="semak"; tunjuk("kuiz"); lukisSoalan(); };
     grid.appendChild(d);
   });
   tunjuk("keputusan");
-  hantarJawapan();
 }
 
+/* ---------- HANTAR KE GOOGLE SHEET ---------- */
 function binaMuatan(){
   const set = BANK[setSemasa];
   return {
@@ -461,10 +620,10 @@ function binaMuatan(){
     set: setSemasa, namaSet: set.nama,
     jumlah: set.soalan.length,
     skor: set.soalan.reduce((a,s,i)=>a+(jawapanSaya[i]===s.j?1:0),0),
-    masaTotal: masaItem.reduce((a,b)=>a+b,0),
+    masaTotal: masaItem.reduce((a,b)=>a+(b||0),0),
     jawapan: jawapanSaya.map(x=>x||"-"),
     kunci: set.soalan.map(s=>s.j),
-    masa: masaItem,
+    masa: masaItem.map(x=>x||0),
     mula: mulaKuizPada.toISOString(),
     tamat: new Date().toISOString()
   };
@@ -493,6 +652,8 @@ async function hantarJawapan(){
   }
 }
 el("btn-hantar-semula").onclick = hantarJawapan;
+el("btn-menu2").onclick = ()=>{ clearInterval(jamTimer); tunjuk("menu"); };
+el("btn-ulang").onclick = ()=>mulaKuiz(setSemasa);
 
 /* ---------- CETAK ---------- */
 function bahagianCetak(kunci, sertaJawapanSaya){
@@ -527,6 +688,14 @@ function bahagianCetak(kunci, sertaJawapanSaya){
 }
 function cetakSet(kunci){ el("cetak").innerHTML = bahagianCetak(kunci,false); window.print(); }
 el("btn-cetak-keputusan").onclick = ()=>{ el("cetak").innerHTML = bahagianCetak(setSemasa,true); window.print(); };
+
+/* ---------- amaran sebelum tutup semasa menjawab ---------- */
+window.addEventListener("beforeunload", (e)=>{
+  if(mod==="jawab" && setSemasa && !dahHantar){
+    simpanProgres();
+    e.preventDefault(); e.returnValue = "";
+  }
+});
 
 /* ---------- MULA ---------- */
 binaDaftar();
